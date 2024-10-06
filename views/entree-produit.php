@@ -4,11 +4,31 @@
     $titre = "Gestion des Entrées des produits";
     $database = new Connexion();
     $con = $database->get_connexion();
+
+
     $req = $con->prepare("SELECT entree_produit.id,produit.description, entree_produit.date AS date, entree_produit.id_produit AS produit, entree_produit.quantite AS quantite, entree_produit.prix_achat AS prix_achat,entree_produit.prix_vente AS prix_vente, entree_produit.date_expiration AS date_expiration FROM entree_produit JOIN produit ON entree_produit.id_produit=produit.id ");
 
     $req1 = $con->prepare("SELECT * FROM produit");
     $req->execute();
     $req1->execute();
+
+    if(isset($_GET["produit"])){
+        if(!empty($_GET['produit'])){
+            $produit = $_GET['produit'];
+            $req = $con->prepare("SELECT entree_produit.id AS id, entree_produit.id_produit AS produit,entree_produit.date AS date,produit.description,entree_produit.quantite AS quantite,entree_produit.prix_achat AS prix_achat,entree_produit.prix_vente AS prix_vente,entree_produit.date_expiration AS date_expiration FROM entree_produit JOIN produit ON entree_produit.id_produit=produit.id WHERE produit.description=?");
+            $req->execute([$produit]);
+        }
+
+        else{
+
+                $req = $con->prepare("SELECT entree_produit.id AS id, entree_produit.produit AS produit,entree_produit.date AS date,entree_produit.quantite AS quantite,entree_produit.prix_achat AS prix_achat,entree_produit.prix_vente AS prix_vente,entree_produit.date_expiration AS date_expiration FROM entree_produit JOIN produit ON entree_produit.id_produit=produit.id WHERE produit.entree_produt");
+                $req->execute();
+            }
+    }
+    else{
+        $req = $con->prepare("SELECT entree_produit.id,produit.description, entree_produit.date AS date, entree_produit.id_produit AS produit, entree_produit.quantite AS quantite, entree_produit.prix_achat AS prix_achat,entree_produit.prix_vente AS prix_vente, entree_produit.date_expiration AS date_expiration FROM entree_produit JOIN produit ON entree_produit.id_produit=produit.id ");
+        $req->execute();
+    }
 
 ?>
 
@@ -35,7 +55,7 @@
                                    <?php }?>
                                 
                             </select>
-                        </div>
+                        </div>8
                         <div class="form-group">
                             <label for="quantite">Quantité</label>
                             <input name="quantite" type="number" class="form-control" id="quantite"  required>
@@ -51,7 +71,7 @@
 
                         <div class="form-group">
                             <label for="date_expiration">Date d'expiration</label>
-                            <input name="date_expiration" type="date" class="form-control" id="date_expriration"  required>
+                            <input name="date_expiration" type="date" class="form-control" id="date_expriration"required>
                         </div>
 
 
@@ -73,7 +93,7 @@
             <span aria-hidden="true">×</span>
         </button>
       </div>
-      <div class="card-body">
+      <div class="card-body">8
             <p class="card-text">Confirmez-vous la suppression définitive de <b id="label" class="text-dark"> </b> ? Il
                 est important de noter que cette action est définitive et ne peut être révoquée.</p>
         </div>
@@ -84,7 +104,7 @@
             <input type="submit" class="btn btn-primary" value="Oui">
         </form>
         
-      </div>2
+      </div>
     </div>
   </div>
 </div>
@@ -94,6 +114,10 @@
     <div class="content">
         <h3 class="mt-5"><?=$titre?></h3>
         <button class="btn btn-primary mt-3" data-toggle="modal" data-target="#addModal">Ajouter</button>
+ 
+     
+
+
 
         <?php if(isset($_GET['msg']) && isset($_GET['status'])){?>
         <div class="alert alert-<?=$_GET['status']?> alert-dismissible fade show mt-1" role="alert">
@@ -102,6 +126,19 @@
         </div>
         <?php }?>
 
+        
+    <form id="apartmentForm" method="post" action="../upload/upload-recherche-entree-produit.php">
+      <div class="col-md-6">
+        <div class="form-group">
+            <label for="produit8">Produit</label>
+            <input type="text" class="form-control" id="produit" name="produit">
+        </div>
+        
+      
+
+        <input type="submit" class="btn btn-secondary mb-3" value="Rechercher">
+    </form>
+    </div> 
         <table class="table table-striped mt-3">
             <thead>
                 <tr>
