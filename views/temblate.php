@@ -1,5 +1,6 @@
 <?php
     session_start();
+    $role = $_SESSION['role'];
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -96,8 +97,22 @@
         <a href="sortie-produit.php"><i class="bi bi-box-arrow-up"></i> Sortie Produits</a>
         <a href="vente.php"><i class="bi bi-cash"></i> Vente Produits</a>
         <a href="rapport-ventes.php"><i class="bi bi-bar-chart"></i> Rapport de vente</a>
-        <a href="rapport-benefice.php"><i class="bi bi-graph-up"></i> Rapport de bénéfices</a>
-        <a href="utilisateur.php"><i class="bi bi-person-circle"></i> Utilisateurs</a>
+        
+        <?php
+        if(isset($role) ) {
+            if ($role == 'Gerant') {
+            echo '<a href="utilisateur.php"><i class="bi bi-person-circle"></i>Gestion des Utilisateurs</a>';
+            echo ' <a href="rapport-benefice.php"><i class="bi bi-graph-up"></i> Rapport de bénéfices</a> ';
+            } else {
+            echo '<p hidden>' . $role . '</p>';
+            }
+        }
+
+        
+        ?>
+
+        
+        <a href="profil-utilisateur.php"><i class="bi bi-person-circle"></i>Profil utilisateur</a>
     </div>
      <!-- Modal pour ajouter/modifier un médicament -->     
     <?=$contenu?>

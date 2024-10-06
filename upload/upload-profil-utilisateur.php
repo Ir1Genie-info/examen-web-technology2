@@ -12,22 +12,20 @@
         $password = htmlspecialchars($_POST['password']);
         $hash = password_hash($password,PASSWORD_DEFAULT);
         $role = htmlspecialchars($_POST['role']);
-
         
-        $fileInfo = pathinfo($_FILES['profilePhoto']['name']);
-        $imgname = "images/img-$username.".$fileInfo['extension'];
+        $fileInfo = pathInfo($_FILES['profilePhoto']['name']);
+        $imgname = "img-$username.".$fileInfo['extension'];
                                
         if(empty($idUp)){
-            //die(var_dump($_FILES['profilePhoto']));
-            copy($_FILES['profilePhoto']['tmp_name'],'../views/ '.$imgname);
+            move_uploaded_file($_FILES['profilePhoto']['tmp_name'],'../views/images/ '.$imgname);
             $req = $con->prepare("INSERT INTO utilisateur(nom_utilisateurs,firstname,lastname,password,role,profilePhoto) VALUES(?,?,?,?,?,?)");
             $rows = $req->execute([$username,$firstname,$lastname,$hash,$role,$imgname]);
             if($rows == 1){
                 //echo $imgname;
-                header('Location:../views/utilisateur.php?msg=Enregistrement effectué avec succès&status=success');
+                header('Location:../views/profil-utilisateur.php?msg=Enregistrement effectué avec succès&status=success');
             }
             else{
-                header("Location:../views/utilisateur.php?msg=Echec d'enregistrement&status=error");
+                header("Location:../views/profil-utilisateur.php?msg=Echec d'enregistrement&status=error");
                             
             }
         }
@@ -37,10 +35,10 @@
             $req = $con->prepare("UPDATE utilisateur SET nom_utilisateurs = ?,firstname=?,lastname=?,password=?, role=?, profilePhoto=? WHERE id = ?");
             $rows = $req->execute([$username,$firstname,$lastname,$hash,$role,$imgname,$idUp]);
             if($rows == 1){
-                header('Location:../views/utilisateur.php?msg=La modification effectuée avec succès&status=success');
+                header('Location:../views/profil-utilisateur.php?msg=La modification effectuée avec succès&status=success');
             }
             else{
-                header("Location:../views/utilisateur.php?msg=Echec de modification&status=error");
+                header("Location:../views/profil-utilisateur.php?msg=Echec de modification&status=error");
             }
         }
             
@@ -49,10 +47,10 @@
         $idDel = $_POST['idDel'];
         $req = $con->prepare("DELETE FROM utilisateur WHERE id = ?");
         if($req->execute([$idDel])){
-            header('Location:../views/utilisateur.php?msg=Suppression effectuée avec succès&status=success');
+            header('Location:../views/profil-utilisateur.php?msg=Suppression effectuée avec succès&status=success');
         }
         else{
-            header("Location:../views/utilisateur.php?msg=Echec de suppression&status=error");
+            header("Location:../views/profil-utilisateur.php?msg=Echec de suppression&status=error");
         }
             
     }
