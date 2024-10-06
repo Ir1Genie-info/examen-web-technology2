@@ -3,14 +3,30 @@
     include('../upload/connexion.php');
    # include('modal.php');
     $titre = "Gestion de sorties des  Produits";
+   
     $database = new Connexion();
     $con = $database->get_connexion();
     $req = $con->prepare("SELECT entree_produit.id,produit.description FROM entree_produit JOIN produit ON produit.id=entree_produit.id_produit");
+    
     $req->execute();
-    $rq = $con->prepare("SELECT sortie_produit.id,sortie_produit.description,sortie_produit.date,sortie_produit.id_entree_produit,sortie_produit.quantite,produit.description AS produit FROM sortie_produit JOIN entree_produit ON entree_produit.id=sortie_produit.id_entree_produit JOIN produit ON produit.id=entree_produit.id_produit");
-    // $rq = $con->prepare("SELECT *FROM entree_produit");
-     $rq->execute();
+    
+     if(isset($_GET['designation'])){
+        if (!empty($_GET['designation'])){
+            $designation = $_GET['designation'];
+            $rq = $con->prepare("SELECT sortie_produit.id,sortie_produit.description,sortie_produit.date,sortie_produit.id_entree_produit,sortie_produit.quantite,produit.description AS produit FROM sortie_produit JOIN entree_produit ON entree_produit.id=sortie_produit.id_entree_produit JOIN produit ON produit.id=entree_produit.id_produit WHERE produit.description = ?");
+            $rq->execute([$designation]);
 
+        }
+        else{
+            $rq = $con->prepare("SELECT sortie_produit.id,sortie_produit.description,sortie_produit.date,sortie_produit.id_entree_produit,sortie_produit.quantite,produit.description AS produit FROM sortie_produit JOIN entree_produit ON entree_produit.id=sortie_produit.id_entree_produit JOIN produit ON produit.id=entree_produit.id_produit");
+            $rq->execute();
+        }
+     }
+     else{
+        $rq = $con->prepare("SELECT sortie_produit.id,sortie_produit.description,sortie_produit.date,sortie_produit.id_entree_produit,sortie_produit.quantite,produit.description AS produit FROM sortie_produit JOIN entree_produit ON entree_produit.id=sortie_produit.id_entree_produit JOIN produit ON produit.id=entree_produit.id_produit");
+        $rq->execute();
+
+     }
 ?>
 
     <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true">
@@ -85,6 +101,15 @@
             <button type="button" class="close" data-dismiss="alert" aria-label="Close">x</button>
         </div>
         <?php }?>
+        <form method="post" id="Form" action="../upload/upload-rechercher-sortie.php">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="designation">Description</label>
+                    <input type="text"  class="form-control" id="description" name="designation">
+                </div>
+            </div>
+            <input type="submit" class="btn btn-secondary mb-3" value="Rechercher">
+        </form>
 
         <table class="table table-striped mt-3">
             <thead>
