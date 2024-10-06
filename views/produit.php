@@ -2,13 +2,36 @@
     ob_start(); 
     include('../upload/connexion.php');
     $titre = "Produits";
+
     $database = new Connexion();
     $con = $database->get_connexion();
-    $req = $con->prepare("SELECT produit.id AS id, produit.description AS description, categorie_produit.id AS id_categorie_produit, categorie_produit.description AS categorie FROM categorie_produit,produit WHERE categorie_produit.id=produit.id_categorie_produit");
-    $req->execute();
+
+    if(isset($_GET['designation'])){
+        if (!empty($_GET['designation'])) {
+            $designation = $_GET['designation'];
+             $req = $con->prepare("SELECT produit.id AS id, produit.description AS description, categorie_produit.id AS id_categorie_produit, categorie_produit.description AS categorie FROM produit JOIN categorie_produit ON categorie_produit.id = produit.id_categorie_produit WHERE produit.description = ?");
+           $req->execute([$designation]);
+        }
+        else{
+
+            $req = $con->prepare("SELECT produit.id AS id, produit.description AS description, categorie_produit.id AS id_categorie_produit, categorie_produit.description AS categorie FROM produit JOIN categorie_produit ON categorie_produit.id = produit.id_categorie_produit");
+            $req->execute();
+        }
+    }
+    else{
+
+        $req = $con->prepare("SELECT produit.id AS id, produit.description AS description, categorie_produit.id AS id_categorie_produit, categorie_produit.description AS categorie FROM produit JOIN categorie_produit ON categorie_produit.id = produit.id_categorie_produit");
+        $req->execute();
+    }  
+
+    
 
     $rq = $con->prepare("SELECT * FROM categorie_produit");
     $rq->execute();
+
+    $r = $con->prepare("SELECT * FROM categorie_produit");
+    $r->execute();
+
 
 ?>
 
@@ -82,6 +105,16 @@
         </div>
         <?php }?>
 
+        <form id="apartmentForm" method="post" action="../upload/upload-rechercher-produit.php">
+            <div class="row mt-3">
+                <div class="mb-3 col-6">
+                   <label for="quantite">Designation</label>
+                    <input type="text" class="form-control" id="designation" name="designation">
+                </div>
+                        
+            </div>            
+            <input type="submit" class="btn btn-secondary mb-3" value="Rechercher">
+        </form>
         <table class="table table-striped mt-3">
             <thead>
                 <tr>
