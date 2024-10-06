@@ -1,3 +1,11 @@
+
+<?php
+
+$database = new Connexion();
+$con = $database->get_connexion();
+$req = $con->prepare("SELECT   COUNT(*) as bs  FROM entree_produit WHERE entree_produit.date_expiration<=NOW();");
+$req->execute();  
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -59,17 +67,32 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
+
             <ul class="navbar-nav ml-auto">
+            <div class="dropdown notifications">
+                <a class="btn btn-light dropdown-toggle" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false" href='medicamentsexpires .php'>
+                    <i class="bi bi-bell"></i> Medicament expirés  <span class="badge badge-danger">
+                    
+                    <?php $num=0;
+             while($data = $req->fetch()){ $num++; ?>
+             
+                
+                    
+                    <td><?=$data->bs?></td>
+                    
+                
+
+                <?php }?>
+                </span>
+                </a>
+            </div>
                 <li class="nav-item">
                     <a class="nav-link text-white" href="#">Accueil</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link text-white" href="#">À propos</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link text-white" href="#">Contact</a>
-                </li>
-                <li class="nav-item dropdown">
+                <li>
                     <a class="nav-link dropdown-toggle text-white" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <div class="profile-pic">
                             <img src="images/user-profile.png" alt="Profil Utilisateur"> <!-- Chemin vers votre image de profil -->
@@ -84,6 +107,7 @@
         </div>
     </nav>
 
+    
     <!-- Barre de navigation latérale -->
     <div class="sidebar">
         <h2 class="text-white">Pharmacie</h2>
