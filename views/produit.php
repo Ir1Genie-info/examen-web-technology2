@@ -1,22 +1,63 @@
 <?php
     ob_start(); 
-    $titre = "Gestion des produit Produits";
+    include('../upload/connexion.php');
+    $titre = "Produits";
+
+    $database = new Connexion();
+    $con = $database->get_connexion();
+
+    if(isset($_GET['designation'])){
+        if (!empty($_GET['designation'])) {
+            $designation = $_GET['designation'];
+             $req = $con->prepare("SELECT produit.id AS id, produit.description AS description, categorie_produit.id AS id_categorie_produit, categorie_produit.description AS categorie FROM produit JOIN categorie_produit ON categorie_produit.id = produit.id_categorie_produit WHERE produit.description = ?");
+           $req->execute([$designation]);
+        }
+        else{
+
+            $req = $con->prepare("SELECT produit.id AS id, produit.description AS description, categorie_produit.id AS id_categorie_produit, categorie_produit.description AS categorie FROM produit JOIN categorie_produit ON categorie_produit.id = produit.id_categorie_produit");
+            $req->execute();
+        }
+    }
+    else{
+
+        $req = $con->prepare("SELECT produit.id AS id, produit.description AS description, categorie_produit.id AS id_categorie_produit, categorie_produit.description AS categorie FROM produit JOIN categorie_produit ON categorie_produit.id = produit.id_categorie_produit");
+        $req->execute();
+    }  
+
+    
+
+    $rq = $con->prepare("SELECT * FROM categorie_produit");
+    $rq->execute();
+
+    $r = $con->prepare("SELECT * FROM categorie_produit");
+    $r->execute();
+
+
 ?>
 
     <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="ajouter_categorie"><?=$titre?></h5>
+                    <h5 class="modal-title" id="ajouter_produit">Ajouter un produit</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">×</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form id="Form" method="post">
+                    <form id="Form" method="post" action="../upload/upload-produit.php">
                         <div class="form-group">
+                            <input type="text" name="idUp" id="idUp" hidden>
                             <label for="description">Description</label>
-                            <input type="text" class="form-control" id="description"  required>
+                            <input type="text" class="form-control" id="description" name="description" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="categorie_produit">Categorie_Produit</label>
+                            <select class="form-control" name="categorie_produit" id="categorie_produit">
+                                <?php while($data = $rq->fetch()){ ?>
+                                <option value="<?=$data->id ?>"><?=$data->description ?></option>
+                                <?php } ?>
+                            </select>
                         </div>
                         <button type="submit" class="btn btn-primary">Enregistrer</button>
                     </form>
@@ -30,7 +71,7 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h1 class="modal-title fs-5" id="staticBackdropLabel">Modal title</h1>
+        <h1 class="modal-title fs-5" id="staticBackdropLabel">Suppression</h1>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">×</span>
         </button>
@@ -40,7 +81,7 @@
                 est important de noter que cette action est définitive et ne peut être révoquée.</p>
         </div>
       <div class="modal-footer">
-        <form action="" method="post">
+        <form action="../upload/upload-produit.php" method="post">
             <input type="text" id="idDel" name="idDel" hidden>
             <button type="button" class="btn btn-secondary" data-dismiss="modal" aria-label="Close">Non</button>
             <input type="submit" class="btn btn-primary" value="Oui">
@@ -64,31 +105,39 @@
         </div>
         <?php }?>
 
+        <form id="apartmentForm" method="post" action="../upload/upload-rechercher-produit.php">
+            <div class="row mt-3">
+                <div class="mb-3 col-6">
+                   <label for="quantite">Designation</label>
+                    <input type="text" class="form-control" id="designation" name="designation">
+                </div>
+                        
+            </div>            
+            <input type="submit" class="btn btn-secondary mb-3" value="Rechercher">
+        </form>
         <table class="table table-striped mt-3">
             <thead>
                 <tr>
                     <th>Numero</th>
                     <th>Description</th>
+                    <th>CategorieProduit</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
+            <?php while($data = $req->fetch()){?>
                 <tr>
-                    <td>1</td>
-                    <td>Description1</td>
+                    <td><?=$data->id?></td>
+                    <td><?=$data->description?></td>
+                    <td><?=$data->categorie?></td>
                     <td>
                         <button data-toggle="modal" data-target="#addModal" class="btn btn-warning btn-sm editbtn" id="editbtn">Mod</button>
                          <a class="btn btn-danger btn-sm deletebtn" data-toggle="modal" data-target="#modalSuppression">sup</a>
                     </td>
                 </tr>
-                <tr>
-                    <td>2</td>
-                    <td>Description2</td>
-                    <td>
-                        <button data-toggle="modal" data-target="#addModal" class="btn btn-warning btn-sm editbtn" id="editbtn">Mod</button>
-                         <a class="btn btn-danger btn-sm deletebtn" data-toggle="modal" data-target="#modalSuppression">sup</a>
-                    </td>
-                </tr>
+
+                <?php }?>
+                <!-- Les données des médicaments seront insérées ici -->
             </tbody>
         </table>
        
@@ -105,8 +154,8 @@
         $(".editbtn").on("click", function() {
             $tr = $(this).closest('tr');var data = $tr.children('td').map(function(){return $(this).text();}).get();
 
-            $('#votre id ici').val(data[0]);
-           
+            $('#idUp').val(data[0]);
+            $('#description').val(data[1]);
         });
         $(".deletebtn").on("click", function() {
             var label = document.getElementById('label');

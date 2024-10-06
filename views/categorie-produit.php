@@ -92,7 +92,7 @@
                 </tr>
 
                 <?php }?>
-                <!-- Les données des médicaments seront insérées ici -->
+                
             </tbody>
         </table>
        
@@ -111,6 +111,7 @@
 
             $('#idUp').val(data[0]);
             $('#description').val(data[1]);
+           
         });
         $(".deletebtn").on("click", function() {
             var label = document.getElementById('label');

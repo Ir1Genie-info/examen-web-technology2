@@ -5,11 +5,13 @@ $database = new Connexion();
 $con = $database->get_connexion();
 $req = $con->prepare("SELECT   COUNT(*) as bs  FROM entree_produit WHERE entree_produit.date_expiration<=NOW();");
 $req->execute();  
+
+    session_start();
 ?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8">8
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestion de Pharmacie</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
@@ -47,7 +49,7 @@ $req->execute();
         }
         .navbar-brand {
             color: #fff !important; /* Couleur du texte du titre principal */
-            display: flex;
+            display: flex;8
             align-items: center;
         }
         .navbar-brand img {
@@ -59,7 +61,7 @@ $req->execute();
 <body>
     <!-- Barre de navigation en tête -->
     <nav class="navbar navbar-expand-lg navbar-light">
-        <a class="navbar-brand" href="#">
+        <a class="navbar-brand" href="acceuil.php">
             <img src="images/pharmacy-logo.png" alt="Logo Pharmacie"> <!-- Chemin vers votre logo -->
             Gestion de Pharmacie
         </a>
@@ -87,20 +89,24 @@ $req->execute();
                 </a>
             </div>
                 <li class="nav-item">
-                    <a class="nav-link text-white" href="#">Accueil</a>
+                    <a class="nav-link text-white" href="acceuil.php">Accueil</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-white" href="#">À propos</a>
+       
+                    <a class="nav-link text-white" href="apropos.php">À propos</a>
                 </li>
-                <li>
+                
+                <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle text-white" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <div class="profile-pic">
-                            <img src="images/user-profile.png" alt="Profil Utilisateur"> <!-- Chemin vers votre image de profil -->
-                        </div>
+                       
+                      
+                       <h3 class="fw-bold text-uppercase"><?= $_SESSION['username'] ?></h3>                       
+                
                     </a>
+
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
-                        <a class="dropdown-item" href="#">Profil</a>
-                        <a class="dropdown-item" href="#">Déconnexion</a>
+                        <p class='fs-2'><?= $_SESSION['firstname'].' '.$_SESSION['lastname']; ?></p>
+                        <a class="dropdown-item" href="../upload/upload-logout.php">Déconnexion</a>
                     </div>
                 </li>
             </ul>
@@ -115,11 +121,14 @@ $req->execute();
         <a href="produit.php"><i class="bi bi-bag"></i> Produits</a>
         <a href="entree-produit.php"><i class="bi bi-box-arrow-in-down"></i> Entrée Produits</a>
         <a href="sortie-produit.php"><i class="bi bi-box-arrow-up"></i> Sortie Produits</a>
-        <a href="#"><i class="bi bi-cash"></i> Vente Produits</a>
+        <a href="vente.php"><i class="bi bi-cash"></i> Vente Produits</a>
+        <a href="rapport-ventes.php"><i class="bi bi-bar-chart"></i> Rapport de vente</a>
+        <a href="rapport-benefice.php"><i class="bi bi-graph-up"></i> Rapport de bénéfices</a>
         <a href="utilisateur.php"><i class="bi bi-person-circle"></i> Utilisateurs</a>
     </div>
-     <!-- Modal pour ajouter/modifier un médicament -->
+     <!-- Modal pour ajouter/modifier un médicament -->     
     <?=$contenu?>
+    
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

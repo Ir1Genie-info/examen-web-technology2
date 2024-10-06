@@ -1,5 +1,12 @@
 <?php
     ob_start(); 
+    include('../upload/connexion.php');
+    $database = new Connexion();
+    $con = $database->get_connexion();
+    $req = $con->prepare("SELECT * FROM utilisateur");
+    $req->execute();
+
+
     $titre = "Gestion des Utilisateurs";
 ?>
 
@@ -13,23 +20,37 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form id="Form" method="post">
-                    <div class="form-group">
+                    <form action="../upload/upload-utilisateur.php" id="Form" method="post" enctype="multipart/form-data">
+                        <input type="text" name="idUp" id="idUp" hidden>
+                        <div class="form-group">
+                            <label for="nom">Nom</label>
+                            <input type="text" class="form-control" name="nom" id="nom"  required>
+                        </div>
+                        <div class="form-group">
+                            <label for="postnom">Postnom</label>
+                            <input type="text" class="form-control" name="postnom" id="nom_utilisateur"  required>
+                        </div>
+                        <div class="form-group">
                             <label for="nom_utilisateurs">Nom utilisateurs</label>
-                            <input type="text" class="form-control" id="nom_utilisateur"  required>
+                            <input type="text" class="form-control" name="nom_utilisateur" id="nom_utilisateur"  required>
                         </div>
                         <div class="form-group">
                             <label for="password">Password</label>
-                            <input type="text" class="form-control" id="password" required>
+                            <input type="text" class="form-control" name="password" id="password" required>
                         </div>
                         <div class="form-group">
                             <label for="role">Role</label>
-                            <select  id="role" class="form-control">
-                                <option value="">Option1</option>
-                                <option value="">Option2</option>
+                            <select name="role" id="role" class="form-control">
+                                <option value="Comptable">Comptable</option>
+                                <option value="Gerant">Gérant</option>
                             </select>
                         </div>
-                        <button type="submit" class="btn btn-primary">Enregistrer</button>
+                        <div class="form-group">
+                            <label for="photoProfile">Photo de Profil</label>
+                            <input type="file" class="form-control" name="profilePhoto" id="profilePhoto" required>
+                        </div>
+                        <input type="submit" name="submit" class="btn btn-primary" value="Enregistrer" >
+                        <!-- <button type="submit" class="btn btn-primary">Enregistrer</button> -->
                     </form>
                 </div>
             </div>
@@ -41,7 +62,7 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h1 class="modal-title fs-5" id="staticBackdropLabel">Modal title</h1>
+        <h1 class="modal-title fs-5" id="staticBackdropLabel">Suppression</h1>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">×</span>
         </button>
@@ -51,7 +72,7 @@
                 est important de noter que cette action est définitive et ne peut être révoquée.</p>
         </div>
       <div class="modal-footer">
-        <form action="" method="post">
+        <form action="../upload/upload-utilisateur.php" method="post">
             <input type="text" id="idDel" name="idDel" hidden>
             <button type="button" class="btn btn-secondary" data-dismiss="modal" aria-label="Close">Non</button>
             <input type="submit" class="btn btn-primary" value="Oui">
@@ -79,27 +100,38 @@
             <thead>
                 <tr>
                     <th>Numero</th>
-                    <th>Description</th>
+                    <th hidden>ID</th>
+                    <th>Noms</th>
+                    <th>Postnoms</th>
+                    <th>Nom Utilisateurs</th>
+                    <th>Roles</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>Description1</td>
-                    <td>
-                        <button data-toggle="modal" data-target="#addModal" class="btn btn-warning btn-sm editbtn" id="editbtn">Mod</button>
-                         <a class="btn btn-danger btn-sm deletebtn" data-toggle="modal" data-target="#modalSuppression">sup</a>
-                    </td>
-                </tr>
-                <tr>
-                    <td>2</td>
-                    <td>Description2</td>
-                    <td>
-                        <button data-toggle="modal" data-target="#addModal" class="btn btn-warning btn-sm editbtn" id="editbtn">Mod</button>
-                         <a class="btn btn-danger btn-sm deletebtn" data-toggle="modal" data-target="#modalSuppression">sup</a>
-                    </td>
-                </tr>
+                <?php
+                $num = 0;
+                while($data = $req->fetch()){
+                    $num ++;
+                    ?>
+                        <tr>
+                            <td><?=$num ?></td>
+                            <td hidden><?=$data->id ?></td>
+                            <td><?=$data->firstname ?></td>
+                            <td><?=$data->lastname ?></td>
+                            <td><?=$data->nom_utilisateurs ?></td>
+                            <td><?=$data->role ?></td>
+                            <td>
+                                <button data-toggle="modal" data-target="#addModal" class="btn btn-warning btn-sm editbtn" id="editbtn">Mod</button>
+                                <a class="btn btn-danger btn-sm deletebtn" data-toggle="modal" data-target="#modalSuppression">sup</a>
+                            </td>
+                        </tr>
+                    <?php
+                }                    
+                ?>
+                    
+                    
+                
             </tbody>
         </table>
        
@@ -116,16 +148,20 @@
         $(".editbtn").on("click", function() {
             $tr = $(this).closest('tr');var data = $tr.children('td').map(function(){return $(this).text();}).get();
 
-            $('#votre id ici').val(data[0]);
+            $('#idUp').val(data[1]);
+            $('#nom').val(data[2]);
+            $('#postnom').val(data[3]);
+            $('#nom_utilisateur').val(data[4]);
+            $('#role').val(data[5]);        
            
         });
         $(".deletebtn").on("click", function() {
             var label = document.getElementById('label');
             $tr = $(this).closest('tr');var data = $tr.children('td').map(function() {return $(this).text();}).get();
 
-            $("#idDel").val(data[0]);
+            $("#idDel").val(data[1]);
 
-            var valeur = data[1];
+            var valeur = data[2];
             setModal(label, valeur);
         });
     });
