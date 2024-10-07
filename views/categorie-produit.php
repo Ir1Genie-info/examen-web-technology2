@@ -5,8 +5,24 @@
     $titre = "Cagecorie Produit";
     $database = new Connexion();
     $con = $database->get_connexion();
-    $req = $con->prepare("SELECT * FROM categorie_produit");
-    $req->execute();
+    if(isset($_GET['description'])){
+        if (!empty($_GET['description'])){
+            $des = $_GET['description'];
+            $req = $con->prepare("SELECT * FROM categorie_produit WHERE description=?");
+            $req->execute([$des]);
+        
+        }
+        else
+        {
+            $req = $con->prepare("SELECT * FROM categorie_produit");
+            $req->execute();
+        }
+    }
+    else{
+        $req = $con->prepare("SELECT * FROM categorie_produit");
+        $req->execute();
+    }
+        
 
 ?>
 
@@ -64,6 +80,19 @@
     <div class="content">
         <h3 class="mt-5"><?=$titre?></h3>
         <button class="btn btn-primary mt-3" data-toggle="modal" data-target="#addModal">Ajouter</button>
+
+        <div class="modal-body">
+                    <form id="Form" method="post" action="../upload/upload_categ_produit_rechecher.php">
+                        <div class="form-group">
+                            <input type="text" name="idUp" id="idUp" hidden>
+                            <label for="description">Description</label>
+                            <input type="text" class="form-control" id="description" name="description" required>
+                        </div>
+                        <input type="submit" class="btn btn-secondary mb-3" value="Rechercher">
+                    </form>
+                </div>
+
+        
 
         <?php if(isset($_GET['msg']) && isset($_GET['status'])){?>
         <div class="alert alert-<?=$_GET['status']?> alert-dismissible fade show mt-1" role="alert">

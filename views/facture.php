@@ -16,7 +16,7 @@ produit.id = entree_produit.id_produit where vente_produit.facture=?");
     $req_afficher_facture->execute([$facture]);
 ?>
 
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="en">
 <head>
     <meta charset="UTF-8">
