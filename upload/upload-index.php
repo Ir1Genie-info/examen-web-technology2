@@ -18,6 +18,7 @@
             $_SESSION['username'] = $user->nom_utilisateurs;
             $_SESSION['firstname'] = $user->firstname;
             $_SESSION['lastname'] = $user->lastname;
+            $_SESSION['role'] = $user->role;
             $_SESSION['profilePicture'] = $user->profilePhoto;
             //die(var_dump($_SESSION['profilePicture']));
 
